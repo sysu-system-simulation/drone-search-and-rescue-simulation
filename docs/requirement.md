@@ -41,7 +41,7 @@ would be invented rather than measured.
 | UAV speed | 1 cell/step | 5 m/s ≈ 18 km/h |
 | Launch point | cell (20, 20) | map centre |
 | Fleet size | N = 1 … 20 | swept in Experiment 1 |
-| Replications | 200 per configuration | Monte Carlo sample size |
+| Replications | 400 per configuration | Monte Carlo sample size |
 | Seeds | map 7, target 1000 | fixed, so every run is reproducible |
 
 All numbers live in `config.m`; no other file contains a tunable constant.
@@ -147,8 +147,9 @@ are cut, not forgotten.
 > N\* is the smallest fleet size whose `P_found` reaches 95% of the plateau, where the plateau is
 > the mean of the last three fleet sizes tested.
 
-A stricter "every extra drone adds less than 2 percentage points" rule is not usable: with 200
-replications the confidence interval is about ±3 pp, so a 2 pp test sits inside the noise.
+A stricter "every extra drone adds less than 2 percentage points" rule is not usable: with 400
+replications the confidence interval near P = 0.9 is about ±3 pp, so a 2 pp test sits inside the
+noise.
 
 ---
 

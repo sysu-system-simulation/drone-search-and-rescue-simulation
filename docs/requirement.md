@@ -144,8 +144,9 @@ are cut, not forgotten.
 
 **Saturation fleet size N\*** — there is no closed-form optimum, so it is defined operationally:
 
-> N\* is the smallest fleet size whose `P_found` reaches 95% of the plateau, where the plateau is
-> the mean of the last three fleet sizes tested.
+> N\* is the smallest fleet size whose `P_found` reaches 95% of the plateau, where the curve is
+> smoothed with a 3-point moving average and the plateau is the mean of the last three smoothed
+> points. Smoothing prevents a single noisy fleet size from moving N\* by several drones.
 
 A stricter "every extra drone adds less than 2 percentage points" rule is not usable: with 400
 replications the confidence interval near P = 0.9 is about ±3 pp, so a 2 pp test sits inside the

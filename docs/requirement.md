@@ -1,96 +1,260 @@
-# Drone Search and Rescue Simulation using Monte Carlos and Discrete time simulation.
+# Drone Search and Rescue Simulation
 
-![Figure 1 from the original document](image1.png)
+**System Simulation Technology (SE5207) — team project**
 
-## 1. Simulation Configuration
+A discrete-time Monte Carlo simulation of a UAV fleet searching for one missing person on a
+gridded terrain, implemented in MATLAB. The system evolves in fixed time steps, the target
+location and every sensor outcome are stochastic, and each configuration is repeated many times so
+that results can be reported with confidence intervals.
 
-- Number of UAVs (configurable: 1, 2, 3, 5, 8, 10)
-- Number of missing people (configurable: 1,2,3,4,5,6,7,8,9,10) can also be unknown
-- Map size (configurable: 1,2,3,4,5,6,7,8,9,10)
-- Simulation duration
-- Simulation time step
-- Random seed
+![Conceptual 2D search environment](image1.png)
 
-## 2. UAV Fleet
+*Conceptual environment from the original draft. The prototype implements four terrain classes
+(open, forest, urban, water) and one missing person; hills are left to future work.*
 
-Each UAV has the following properties:
+---
 
-- Current position (X, Y)
-- Battery level
-- Flight speed
-- Sensor detection probability
-- Vision range
-- Battery consumption rate
-- Operating status (Searching, Returning, Inactive)
-- Assigned destination
+## 1. Objective
 
-## 3. Environment
+The paper answers three questions, in this order:
 
-### 3.1 Terrain
+1. **Fleet-size saturation.** How does the probability of finding the target grow with the number
+   of drones, and at what fleet size does adding another drone stop helping?
+2. **Strategy comparison across terrain.** At each strategy's own saturation fleet size, does the
+   ranking of the strategies survive when the terrain changes?
+3. **Sensor sensitivity.** How much do the conclusions depend on the sweep width, which is the least
+   certain input of the model?
 
-- Terrain type (Open field, Forest, Water, Urban, Hills)
-- Terrain visibility factor
-- Detection probability modifier
-- Flight restrictions
-- Terrain generation probability (optional)
+Cost-effectiveness is **not** studied: the team has no reliable unit-cost data, so any cost model
+would be invented rather than measured.
 
-### 3.2 Missing People
+---
 
-- Unique identifier
-- Coordinates (X, Y)
-- Detection status (Found / Not Found)
-- Detection time
+## 2. Simulation configuration
 
-## 4. Search Strategies
+| Parameter | Value | Meaning |
+|---|---|---|
+| Grid | 40 × 40 cells | search area |
+| Cell size | 100 m | 4 km × 4 km = 16 km² |
+| Time step | 20 s | one simulation tick |
+| Mission length | 300 steps | 100 min of search per replication |
+| UAV speed | 1 cell/step | 5 m/s ≈ 18 km/h |
+| Launch point | cell (20, 20) | map centre |
+| Fleet size | N = 1 … 20 | swept in Experiment 1 |
+| Replications | 200 per configuration | Monte Carlo sample size |
+| Seeds | map 7, target 1000 | fixed, so every run is reproducible |
 
-Each strategy controls the entire UAV fleet. The number of UAVs is configurable and identical across strategies within an experiment.
+All numbers live in `config.m`; no other file contains a tunable constant.
 
-- Parallel Track Search – UAVs follow systematic parallel paths across the search area.
-- Expanding Square Search – UAVs search outward from a known reference location.
-- Sector Search – UAVs search radial paths around a central reference point.
-- Probability-Based Search – UAVs prioritize areas with higher estimated probabilities of containing missing people.
-- Adaptive Cooperative Search – UAVs coordinate and dynamically reassign search tasks based on mission progress.
+---
 
-![Figure 2 from the original document](image2.png)
+## 3. UAV model
 
-## 5. Performance Evaluation
+Each drone is a point that moves one *king move* (8-neighbour) per step toward its current
+waypoint. It carries one downward-looking sensor whose detection performance is summarised by a
+**sweep width** (Section 4.3).
 
-### 5.1 Search Effectiveness
+Modelled state per drone: position and current waypoint. Navigation is assumed perfect.
 
-- Detection rate
-- Average detection time
-- Time to reach a target detection percentage
-- Area coverage percentage
-- Search overlap and redundancy
+**Battery is not modelled in v1.** The mission is treated as continuously supported (battery
+swaps at base), which keeps the fleet-size comparison free of charging artefacts. Battery,
+return-to-base and recharge states are listed as future work.
 
-### 5.2 UAV Resource Utilization
+---
 
-- Total battery consumption
-- Total UAV flight time
-- UAV utilization rate
+## 4. Environment
 
-### 5.3 Cost-Effectiveness
+### 4.1 Terrain
 
-- Total operational cost
-- Cost per detected person
-- Operational cost versus detection time
-- Marginal benefit of adding more UAVs
+| Class | Code | Sweep-width multiplier |
+|---|---|---|
+| Open field | 1 | 1.00 |
+| Forest | 2 | 0.55 |
+| Urban | 3 | 0.45 |
+| Water | 4 | 0.20 |
 
-## 6. Simulation Experiments
+Four maps are used: `open`, `forest`, `urban` and `mixed`. Modelling terrain as a multiplier on the
+sweep width follows IAMSAR practice, where sweep width is tabulated per terrain/visibility and then
+corrected by factors (Vol. II, Tables N-4 … N-10). Terrain that changes speed but not detection
+would be physically wrong and is not used.
 
-- Experiment 1: Search Strategy Comparison – Compare the five strategies under identical simulation conditions.
-- Experiment 2: UAV Fleet Size Comparison – Evaluate how increasing the number of UAVs affects detection time, coverage, and performance.
-- Experiment 3: Cost-Effectiveness Analysis – Determine whether additional UAVs provide sufficient performance improvement to justify their cost.
-- Experiment 4: Terrain Impact Analysis – Evaluate how different terrain types affect the performance of search strategies.
-- Experiment 5: Sensor Reliability Analysis – Evaluate how changes in detection probability affect mission success.
+### 4.2 Search prior
 
-## 7. Expected Outputs
+A probability map `prior(row, col)` states where the missing person probably is. It is built from
 
-- Animated 2D UAV search simulation in MATLAB
-- UAV trajectories and search coverage maps
-- Detection rate comparison graphs
-- Search time versus UAV fleet size graphs
-- Operational cost versus fleet size graphs
-- Cost-effectiveness comparison across search strategies
-- Statistical summaries from repeated Monte Carlo simulations
-- Final analysis and conclusions identifying suitable strategies and fleet sizes under different conditions
+- a terrain weight (a person is more likely in forest/urban cover and almost never in water), and
+- two Gaussian "last seen" hot spots.
+
+The prior sums to 1 and is the **only** extra information the probability-based strategy receives.
+The other two strategies ignore it, which is the point of the comparison.
+
+### 4.3 Detection model
+
+With track spacing equal to one cell and sweep width `W` measured in cells, one pass over a cell
+detects the target with
+
+```
+p_pass = 1 - exp(-W_eff / S),   S = 1 cell
+W_eff  = sweep_width × terrain_multiplier × sensitivity_scale
+```
+
+Every visit is an independent trial, so after `k` passes
+
+```
+P(k) = 1 - (1 - p_pass)^k
+```
+
+This is the cell form of Koopman's random-search curve. It is a **conservative lower bound** for a
+well-spread systematic sweep (the better definite-range result is `erf(pi*W/2S)`), and the paper
+labels it as such. Using one cited formula replaces the arbitrary per-terrain constants of the
+first draft.
+
+### 4.4 Missing person
+
+One static target, drawn from the prior at the start of each replication. The **same** target index
+is reused for every strategy and fleet size (common random numbers), so differences between
+strategies are not caused by different targets.
+
+---
+
+## 5. Search strategies
+
+| ID | Strategy | Behaviour | Role |
+|---|---|---|---|
+| S1 | **Parallel track** | the map is split into N horizontal bands; each drone sweeps its band in a lawn-mower pattern and repeats it | systematic baseline, IAMSAR-valid for multiple searchers |
+| S2 | **Probability-based** | the map is cut into 8 × 8 blocks ranked by prior mass; drones take the most likely unsearched block, sweep it, then take the next | the "smart" strategy |
+| S3 | **Random walk** | each drone moves to a random 8-neighbour cell | null baseline: what intelligence buys |
+
+**Why only three.** IAMSAR defines expanding square and sector search as **single-aircraft**
+patterns, so running them for a whole fleet is not doctrinally valid without redefining them (a
+research contribution, not a two-week exercise). Adaptive cooperative search needs inter-drone
+communication and task reallocation and is the least standardised part of the original draft. Both
+are cut, not forgotten.
+
+---
+
+## 6. Output metrics
+
+| Metric | Definition |
+|---|---|
+| `P_found` | fraction of replications in which the target is detected before `tMax` |
+| `T_found` | mission step of detection (censored at `tMax`) |
+| `coverage` | fraction of cells visited at least once during the full fixed-duration mission (not truncated at detection time) |
+| 95% CI | Wilson score interval on `P_found` |
+
+**Saturation fleet size N\*** — there is no closed-form optimum, so it is defined operationally:
+
+> N\* is the smallest fleet size whose `P_found` reaches 95% of the plateau, where the plateau is
+> the mean of the last three fleet sizes tested.
+
+A stricter "every extra drone adds less than 2 percentage points" rule is not usable: with 200
+replications the confidence interval is about ±3 pp, so a 2 pp test sits inside the noise.
+
+---
+
+## 7. Experiments
+
+### Experiment 1 — Fleet-size saturation (open map)
+
+- N = 1 … 20, three strategies, identical mission time and identical targets.
+- Output: `P_found(N)` with 95% CI, the saturation point N\* per strategy, and the marginal-gain
+  curve.
+- Sanity check: `P_found(N)` must be non-decreasing within its confidence interval and can never
+  exceed 1. The closed-form independence bound `1 - (1 - P_1)^N` is checked on the **random-walk**
+  baseline only; it does not apply to parallel track, where each drone's band shrinks as the fleet
+  grows.
+
+### Experiment 2 — Strategy comparison across terrain
+
+- Terrains: open, forest, urban, mixed.
+- Each strategy runs at its own N\* from Experiment 1.
+- Output: grouped bar chart with confidence intervals.
+- Question: does the ranking from Experiment 1 hold when terrain changes?
+
+### Experiment 3 — Sweep-width sensitivity
+
+- Sweep width scaled by ×0.5, ×1 and ×2 on the open map, fleet sizes fixed at N\*.
+- Output: `P_found` versus sensor scale.
+- Rationale: it costs one multiplier and answers the "sensor reliability" question of the draft.
+
+---
+
+## 8. Verification
+
+`validate_sim.m` runs six checks before any result is used:
+
+1. the prior sums to 1 and `detP` matches `1 - exp(-W)` for every terrain class;
+2. a Monte Carlo of the per-pass detection reproduces the analytic `p`;
+3. the random-walk baseline stays below the independence bound `1 - (1 - P_1)^N`;
+4. coverage increases with fleet size for the systematic strategy;
+5. a fixed seed reproduces the same mission exactly;
+6. the saturation rule finds the knee of a synthetic curve.
+
+The summary must be 6 / 6 PASS.
+
+---
+
+## 9. Assumptions and limitations
+
+- The map is a grid; real search areas are continuous. Cell size is a modelling choice.
+- The target is static and does not react to the drones.
+- Detection trials are independent, both within and between passes.
+- Terrain multipliers are illustrative values in the range used by IAMSAR, not measurements for a
+  specific sensor.
+- No wind, no terrain-induced speed changes, no communication limits, no collisions.
+- One missing person only.
+- Validation against real SAR outcome data is outside the scope of the course project; the paper
+  verifies the implementation, not the real-world accuracy.
+
+---
+
+## 10. Out of scope / future work
+
+- Battery, return-to-base and recharge as explicit states.
+- Multiple missing people (the original draft allowed 1…10).
+- Hills terrain class.
+- Adaptive cooperative task reassignment.
+- Cost-effectiveness analysis.
+- Animated playback of a mission.
+
+---
+
+## 11. MATLAB implementation
+
+| File | Purpose |
+|---|---|
+| `config.m` | all parameters |
+| `make_scenario.m` | terrain, prior and detection map |
+| `boustrophedon.m` | lawn-mower path over a rectangle |
+| `rank_blocks.m` | blocks sorted by prior mass |
+| `simulate_once.m` | one mission of the fleet |
+| `optimal_n.m` | saturation rule (N\*) |
+| `wilson_ci.m` | 95% confidence interval |
+| `run_experiment1.m` | fleet-size saturation |
+| `run_experiment2.m` | strategy × terrain |
+| `run_experiment3.m` | sweep-width sensitivity |
+| `validate_sim.m` | the six self-checks |
+| `plot_scenario.m` | scenario figure |
+| `run_all.m` | verification + the three experiments |
+
+Run order:
+
+```matlab
+validate_sim          % must print 6 / 6 PASS
+run_all               % verification, then Experiments 1-3
+plot_scenario('mixed', 5)
+```
+
+Outputs are written to `results/` (CSV and MAT) and `figures/` (PNG).
+
+---
+
+## 12. References
+
+- IAMSAR Manual, Vol. II, Ch. 5, *Search patterns and sweep width* (2019 edition).
+- B. O. Koopman, "The theory of search II", *Operations Research* 4(5), 1956.
+- J. R. Frost & L. D. Stone, *Review of Search Theory*, 2001.
+- R. Perkins & D. Lovelock, *Lateral range curves, search probabilities and grid searching*, 2008.
+- Haddad et al., *Sensors* 23(23):9540, 2023.
+- Shao et al., *EURASIP J. Adv. Signal Process.*, 2021.
+- Ghassemi & Chowdhury, arXiv:1905.09988, 2019.

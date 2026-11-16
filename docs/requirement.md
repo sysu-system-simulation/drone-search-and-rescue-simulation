@@ -142,15 +142,21 @@ are cut, not forgotten.
 | `coverage` | fraction of cells visited at least once during the full fixed-duration mission (not truncated at detection time) |
 | 95% CI | Wilson score interval on `P_found` |
 
-**Saturation fleet size N\*** — there is no closed-form optimum, so it is defined operationally:
+**Saturation fleet size N\*** — no closed-form optimum exists, so it is defined operationally.
+With `N = 1 … 20` and `P(N)` the measured detection probability:
 
-> N\* is the smallest fleet size whose `P_found` reaches 95% of the plateau, where the curve is
-> smoothed with a 3-point moving average and the plateau is the mean of the last three smoothed
-> points. Smoothing prevents a single noisy fleet size from moving N\* by several drones.
+1. **Smooth** the curve with a 3-point moving average, endpoints unchanged:
+   `P̃(N) = (P(N−1) + P(N) + P(N+1)) / 3` for `2 ≤ N ≤ 19`.
+2. **Plateau:** `P_plateau = (P̃(18) + P̃(19) + P̃(20)) / 3`.
+3. **N\* = the smallest N with `P̃(N) ≥ 0.95 × P_plateau`.**
+
+Smoothing and averaging the last three points both exist to stop one noisy fleet size from moving
+N\* by several drones. N\* is reported with its confidence interval and treated as accurate to about
+±2 drones. Experiments 2 and 3 then run every strategy at its own N\*.
 
 A stricter "every extra drone adds less than 2 percentage points" rule is not usable: with 400
 replications the confidence interval near P = 0.9 is about ±3 pp, so a 2 pp test sits inside the
-noise.
+noise and a slowly rising curve never satisfies it.
 
 ---
 

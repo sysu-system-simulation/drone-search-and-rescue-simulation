@@ -1,0 +1,8 @@
+# MATLAB
+*.asv
+*.autosave
+*.mex*
+slprj/
+
+# macOS
+.DS_Store

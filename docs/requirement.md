@@ -28,6 +28,16 @@ The paper answers three questions, in this order:
 Cost-effectiveness is **not** studied: the team has no reliable unit-cost data, so any cost model
 would be invented rather than measured.
 
+### 1.1 Assessment requirements
+
+Two hard requirements come from the course, not from the model:
+
+- **Paper length ≥ 5,000 words** (excluding references). The current draft is about 6,700.
+- **A presentation in the final class**, roughly 10 minutes, plus questions.
+
+Both deliverables are built from the same three figures and three experiments, so the presentation
+adds no new simulation work.
+
 ---
 
 ## 2. Simulation configuration
@@ -209,6 +219,12 @@ The summary must be 6 / 6 PASS.
 - Detection trials are independent, both within and between passes.
 - Terrain multipliers are illustrative values in the range used by IAMSAR, not measurements for a
   specific sensor.
+- The nominal sweep width is **one grid cell**, i.e. a modelling unit chosen so that track spacing
+  equals sweep width (the documented full-coverage convention), not a calibrated sensor figure.
+  IAMSAR tabulates sweep width for manned aircraft and vessels (about 0.2 NM for a person in water
+  seen from a vessel); no equivalent table exists for small multirotor sensors (Sulaiman & Pierce,
+  2023). Anchoring `W` to a real sensor would require both a different grid resolution and a
+  drone-specific table, and is left as future work.
 - No wind, no terrain-induced speed changes, no communication limits, no collisions.
 - One missing person only.
 - Validation against real SAR outcome data is outside the scope of the course project; the paper
@@ -242,18 +258,22 @@ The summary must be 6 / 6 PASS.
 | `run_experiment2.m` | strategy × terrain |
 | `run_experiment3.m` | sweep-width sensitivity |
 | `validate_sim.m` | the six self-checks |
+| `check_sampling.m` | inverse-transform validation: 20 000 draws vs the analytical prior (Figure 5) |
+| `run_convergence.m` | running estimate and 1/√n half-width (Figure 4) |
+| `style_figure.m` | shared figure styling for all exports |
 | `plot_scenario.m` | scenario figure |
-| `run_all.m` | verification + the three experiments |
+| `run_all.m` | verification, the three experiments and the two methodological checks |
 
 Run order:
 
 ```matlab
 validate_sim          % must print 6 / 6 PASS
-run_all               % verification, then Experiments 1-3
+run_all               % verification, Experiments 1-3, convergence and sampling checks
 plot_scenario('mixed', 5)
 ```
 
-Outputs are written to `results/` (CSV and MAT) and `figures/` (PNG).
+`run_all` produces every table and figure in the paper: `results/exp1..exp4` (CSV and MAT) and
+`figures/fig1..fig5` (PNG).
 
 ---
 
@@ -261,8 +281,31 @@ Outputs are written to `results/` (CSV and MAT) and `figures/` (PNG).
 
 - IAMSAR Manual, Vol. II, Ch. 5, *Search patterns and sweep width* (2019 edition).
 - B. O. Koopman, "The theory of search II", *Operations Research* 4(5), 1956.
+- L. D. Stone, *Theory of Optimal Search*, Academic Press, 1975.
 - J. R. Frost & L. D. Stone, *Review of Search Theory*, 2001.
 - R. Perkins & D. Lovelock, *Lateral range curves, search probabilities and grid searching*, 2008.
-- Haddad et al., *Sensors* 23(23):9540, 2023.
-- Shao et al., *EURASIP J. Adv. Signal Process.*, 2021.
-- Ghassemi & Chowdhury, arXiv:1905.09988, 2019.
+- M. N. Haddad, A. C. Santos et al., "Intelligent drone swarms to search for victims in post-disaster
+  areas", *Sensors* 23(23):9540, 2023.
+- R. Shao, R. Tao, Y. Liu, Y. Yang, D. Li & J. Chen, "UAV cooperative search in dynamic environment
+  based on hybrid-layered APF", *EURASIP J. Adv. Signal Process.*, 2021.
+- A. Sulaiman & K. Pierce, "Modelling maritime SAR effective sweep widths for helicopters in VDM",
+  arXiv:2304.00983, 2023.
+- A. M. Law, *Simulation Modeling and Analysis*, 5th ed., McGraw-Hill, 2015.
+- J. Banks et al., *Discrete-Event System Simulation*, 5th ed., Pearson, 2010.
+- B. P. Zeigler, H. Praehofer & T. G. Kim, *Theory of Modeling and Simulation*, 2nd ed., 2000.
+- R. G. Sargent, "Verification and validation of simulation models", *Journal of Simulation* 7(1),
+  2013.
+
+---
+
+## 13. Deliverables
+
+| File | Purpose |
+|---|---|
+| `UAV_SAR_Simulation_Paper.docx` | the paper (~6,700 words, five figures, five tables) |
+| `UAV_SAR_Paper_Outline.docx` | writing plan: section prompts, word budgets, member split, table shells |
+| `UAV_SAR_Slides.pptx` | 12-slide presentation with speaker notes |
+| `matlab/` | the simulation, exactly as used to produce the results |
+
+The paper is a reference draft. Each member writes their own section in their own words using the
+outline; the numbers are fixed and must not be re-derived.

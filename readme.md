@@ -33,8 +33,8 @@ quality.
 
 | Document | Link |
 |---|---|
-| Team roles and plan | [Google Doc](https://docs.google.com/document/d/PASTE_TEAM_PLAN_DOC_ID/edit) |
-| Paper draft | [Google Doc](https://docs.google.com/document/d/PASTE_PAPER_DOC_ID/edit) |
+| Team roles and plan | [Google Doc](https://docs.google.com/document/d/1-TCIu-HRmsmW8_4MN8NLwyR7yFM9ycW0pcnhkr6QQNw/edit?usp=sharing) |
+| Paper outline and writing plan | [Google Doc](https://docs.google.com/document/d/1JtkWTIxIGMWLt9Xu458Zk6RXfgl2n35RyDgKpGXHlS8/edit?usp=sharing) |
 
 Both are edited online. The repository holds the fixed inputs — specification, code, results — and
 the documents hold the writing.

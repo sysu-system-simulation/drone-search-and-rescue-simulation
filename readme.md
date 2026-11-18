@@ -29,6 +29,16 @@ quality.
 | [`docs/UAV_SAR_Paper_Outline.docx`](docs/UAV_SAR_Paper_Outline.docx) | writing plan: section prompts, word budgets, member split |
 | [`archive/`](archive) | superseded first-draft stub, kept for reference only |
 
+## Collaboration documents
+
+| Document | Link |
+|---|---|
+| Team roles and plan | [Google Doc](https://docs.google.com/document/d/PASTE_TEAM_PLAN_DOC_ID/edit) |
+| Paper draft | [Google Doc](https://docs.google.com/document/d/PASTE_PAPER_DOC_ID/edit) |
+
+Both are edited online. The repository holds the fixed inputs — specification, code, results — and
+the documents hold the writing.
+
 ## Run it
 
 ```matlab

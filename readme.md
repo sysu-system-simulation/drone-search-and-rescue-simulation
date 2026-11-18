@@ -35,7 +35,7 @@ quality.
 
 | Document | Link |
 |---|---|
-| Team roles and plan | [Google Doc](https://docs.google.com/document/d/1-TCIu-HRmsmW8_4MN8NLwyR7yFM9ycW0pcnhkr6QQNw/edit?usp=sharing) |
+| Team roles and plan | [Google Doc](https://docs.google.com/document/d/1cKCjBaCZrian9eQxZ94Oi0Pwl0C1RkQFMKTqkF32dhI/edit?usp=sharing) |
 | Paper outline and writing plan | [Google Doc](https://docs.google.com/document/d/1JtkWTIxIGMWLt9Xu458Zk6RXfgl2n35RyDgKpGXHlS8/edit?usp=sharing) |
 
 Both are edited online. The repository holds the fixed inputs — specification, code, results — and

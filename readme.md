@@ -26,9 +26,7 @@ quality.
 |---|---|
 | [`docs/requirement.md`](docs/requirement.md) | the full specification: model, detection law, strategies, N* rule, experiments, verification, limitations |
 | [`matlab/`](matlab) | the simulation as run: model, three experiments, two methodological checks, verification suite |
-| [`docs/UAV_SAR_Simulation_Paper.docx`](docs/UAV_SAR_Simulation_Paper.docx) | the paper (~6,700 words, five figures, five tables) |
 | [`docs/UAV_SAR_Paper_Outline.docx`](docs/UAV_SAR_Paper_Outline.docx) | writing plan: section prompts, word budgets, member split |
-| [`docs/UAV_SAR_Slides.pptx`](docs/UAV_SAR_Slides.pptx) | 12-slide presentation with speaker notes |
 | [`archive/`](archive) | superseded first-draft stub, kept for reference only |
 
 ## Run it

@@ -302,10 +302,8 @@ plot_scenario('mixed', 5)
 
 | File | Purpose |
 |---|---|
-| `UAV_SAR_Simulation_Paper.docx` | the paper (~6,700 words, five figures, five tables) |
 | `UAV_SAR_Paper_Outline.docx` | writing plan: section prompts, word budgets, member split, table shells |
-| `UAV_SAR_Slides.pptx` | 12-slide presentation with speaker notes |
 | `matlab/` | the simulation, exactly as used to produce the results |
 
-The paper is a reference draft. Each member writes their own section in their own words using the
-outline; the numbers are fixed and must not be re-derived.
+The paper itself is written section by section from the outline. Each member writes their own
+section in their own words; the numbers are fixed and must not be re-derived.

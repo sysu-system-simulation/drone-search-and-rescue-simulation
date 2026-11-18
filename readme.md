@@ -28,6 +28,7 @@ quality.
 | [`matlab/`](matlab) | the simulation as run: model, three experiments, two methodological checks, verification suite |
 | [`docs/UAV_SAR_Paper_Outline.docx`](docs/UAV_SAR_Paper_Outline.docx) | writing plan: section prompts, word budgets, member split |
 | [`docs/references/`](docs/references) | the 13 sources, what each supports and where it is cited |
+| [`docs/research-notes.md`](docs/research-notes.md) | why the design is what it is: the evidence behind each decision |
 | [`archive/`](archive) | superseded first-draft stub, kept for reference only |
 
 ## Collaboration documents

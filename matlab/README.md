@@ -16,7 +16,32 @@ Course project for **System Simulation Technology (SE5207)**.
 
 ## Run
 
-1. Open MATLAB and set the current folder to this repository.
+To open the interactive interface, set MATLAB's current folder to `matlab/` and run:
+
+```matlab
+search_app
+```
+
+Choose terrain, strategy, drone count, number of people (1–5), playback delay,
+and a random seed. **Run animated mission** shows one search, the number of
+people found, the time to find everyone when successful, and coverage. Targets
+are visible in red before detection and turn green when found; these locations
+are shown for visualization and are not given to the search strategies.
+**Run statistical analysis** runs the selected number of independent missions
+and reports the rate of finding everyone, its Wilson 95% confidence interval,
+the average number of people found, and average coverage. Each person is sampled
+independently from the same prior, so multiple people may occupy the same cell.
+Mission and analysis results appear in separate tables with their run settings.
+The same seed and settings reproduce a run; **New seed** chooses a
+fresh one. Pause and resume playback, adjust its delay while it runs, or stop
+playback or analysis. The map key identifies terrain and search markers; use
+**Show target-likelihood contours** to toggle the red prior contours. These
+contours show likely locations, not the person's actual position. The map is
+fixed for each terrain type; the seed controls mission randomness.
+
+To run the command-line experiments:
+
+1. Open MATLAB and set the current folder to `matlab/`.
 2. Run the self-checks first:
 
    ```matlab
@@ -36,6 +61,18 @@ Course project for **System Simulation Technology (SE5207)**.
    ```matlab
    plot_scenario('mixed', 5)
    ```
+
+5. Watch one simulated mission:
+
+   ```matlab
+   animate_search('mixed', 'parallel', 5)
+   ```
+
+   The map shows the drones, visited cells, and the person once detected. Red
+   contours show likely target locations. Choose `open`, `forest`, `urban`, or
+   `mixed` terrain and `parallel`, `prior`, or `random` search. A fourth argument
+   controls the pause per step in seconds, for example `animate_search('mixed',
+   'prior', 5, 0.02)`. The mission continues after detection to show full coverage.
 
 Outputs are written to `results/` (CSV and MAT) and `figures/` (PNG).
 
@@ -88,6 +125,8 @@ The paper, the writing outline and the slide deck live one level up, next to thi
 | `boustrophedon.m` | lawn-mower path over a rectangle |
 | `rank_blocks.m` | map blocks sorted by prior mass |
 | `simulate_once.m` | one mission of the fleet |
+| `animate_search.m` | animate one mission using the simulation's recorded positions |
+| `search_app.m` | interactive mission animation and statistical analysis |
 | `optimal_n.m` | saturation fleet size N* (95%-of-plateau rule) |
 | `wilson_ci.m` | 95% confidence interval |
 | `run_experiment1.m` | fleet-size saturation |

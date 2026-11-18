@@ -1,11 +1,11 @@
-function res = simulate_once(sc, strat, nUav, p, tgtIdx)
+function [res, trace] = simulate_once(sc, strat, nUav, p, tgtIdx, nTargets)
 % SIMULATE_ONCE  Run ONE mission of the fleet (one Monte Carlo replication).
 %
 %   strat  : 'parallel' | 'prior' | 'random'
 %   nUav   : number of drones
-%   tgtIdx : optional linear index of the target cell.  Passing the same
-%            index to several strategies is "common random numbers": every
-%            strategy then faces exactly the same target.
+%   tgtIdx : optional vector of target cell indices. Passing the same
+%            indices to several strategies gives them the same targets.
+%   nTargets : number of targets to sample when tgtIdx is omitted (default 1).
 %
 % Model notes
 %   * one step = one cell = 100 m; the drone's own cell is the only cell it
@@ -18,12 +18,20 @@ function res = simulate_once(sc, strat, nUav, p, tgtIdx)
 H = p.H;  W = p.W;
 
 % ---------- 0. target ------------------------------------------------------
+if nargin < 6 || isempty(nTargets), nTargets = 1; end
 if nargin < 5 || isempty(tgtIdx)
+    validateattributes(nTargets, {'numeric'}, {'scalar', 'integer', 'positive', 'finite'});
     cdf = cumsum(sc.prior(:));
-    tgtIdx = find(cdf >= rand(), 1);
+    tgtIdx = zeros(1, nTargets);
+    for j = 1:nTargets
+        tgtIdx(j) = find(cdf >= rand(), 1);
+    end
 end
+validateattributes(tgtIdx, {'numeric'}, {'vector', 'integer', 'positive', '<=', H*W});
+tgtIdx = tgtIdx(:)';
+nTargets = numel(tgtIdx);
 [tr, tc] = ind2sub([H W], tgtIdx);
-pTarget  = sc.detP(tr, tc);
+pTarget = sc.detP(tgtIdx);
 
 % ---------- 1. plans -------------------------------------------------------
 isParallel = strcmp(strat, 'parallel');
@@ -53,8 +61,14 @@ elseif ~isRandom
     error('simulate_once: unknown strategy "%s"', strat);
 end
 
-found  = false;
-tFound = NaN;
+found = false(1, nTargets);
+timesFound = NaN(1, nTargets);
+if nargout > 1
+    trace.rows = zeros(p.tMax, nUav);
+    trace.cols = zeros(p.tMax, nUav);
+    trace.target = [tr(1), tc(1)];
+    trace.targets = [tr(:), tc(:)];
+end
 
 % ---------- 2. time loop ---------------------------------------------------
 for t = 1:p.tMax
@@ -94,12 +108,16 @@ for t = 1:p.tMax
         end
 
         visited(posR(i), posC(i)) = true;
+        if nargout > 1
+            trace.rows(t, i) = posR(i);
+            trace.cols(t, i) = posC(i);
+        end
 
         % detection trial: only on the target cell, one trial per visit
-        if ~found && posR(i) == tr && posC(i) == tc
-            if rand() < pTarget
-                found  = true;
-                tFound = t;
+        for j = 1:nTargets
+            if ~found(j) && posR(i) == tr(j) && posC(i) == tc(j) && rand() < pTarget(j)
+                found(j) = true;
+                timesFound(j) = t;
             end
         end
     end
@@ -108,7 +126,14 @@ end
 % The mission is NOT cut short when the target is found: every replication
 % must run the same 300 steps, otherwise "coverage" would be censored and a
 % faster fleet would look like it covered less of the map.
-res.found    = found;
-res.tFound   = tFound;
+res.found = all(found);
+res.foundCount = sum(found);
+res.targetCount = nTargets;
+res.timesFound = timesFound;
+if res.found
+    res.tFound = max(timesFound);
+else
+    res.tFound = NaN;
+end
 res.coverage = mean(visited(:));
 end

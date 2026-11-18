@@ -29,6 +29,7 @@ quality.
 | [`docs/UAV_SAR_Simulation_Paper.docx`](docs/UAV_SAR_Simulation_Paper.docx) | the paper (~6,700 words, five figures, five tables) |
 | [`docs/UAV_SAR_Paper_Outline.docx`](docs/UAV_SAR_Paper_Outline.docx) | writing plan: section prompts, word budgets, member split |
 | [`docs/UAV_SAR_Slides.pptx`](docs/UAV_SAR_Slides.pptx) | 12-slide presentation with speaker notes |
+| [`archive/`](archive) | superseded first-draft stub, kept for reference only |
 
 ## Run it
 
@@ -58,4 +59,4 @@ numbers are identical on any machine running the same MATLAB version.
 
 - The simulation is MATLAB-only. An earlier Python prototype is kept locally and is not part of the
   deliverable.
-- `app/` is a leftover stub from the first draft and is not used by the simulation.
+- The original `app/` stub has been moved to [`archive/`](archive); it is not used by the simulation.

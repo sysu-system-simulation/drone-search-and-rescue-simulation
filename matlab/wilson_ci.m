@@ -1,4 +1,4 @@
-function [phat, half] = wilson_ci(k, n, z)
+function [phat, half, lo, hi] = wilson_ci(k, n, z)
 % WILSON_CI  Wilson score confidence interval for a proportion.
 %   k : successes, n : trials, z : normal quantile (default 1.96 = 95%)
 %
@@ -6,6 +6,7 @@ function [phat, half] = wilson_ci(k, n, z)
 % covers the Wilson interval.  Wilson is used instead of
 % phat +/- z*sqrt(phat(1-phat)/n) because the simple formula collapses
 % when phat is near 0 or 1, which happens for small fleets.
+% Optional outputs lo and hi are the Wilson interval endpoints.
 
 if nargin < 3 || isempty(z)
     z = 1.96;

@@ -43,6 +43,16 @@ the documents hold the writing.
 
 ## Run it
 
+For an interactive interface to select a map and strategy, animate a mission,
+and run statistical analysis, open MATLAB and run:
+
+```matlab
+cd matlab
+search_app
+```
+
+To reproduce the project experiments:
+
 ```matlab
 cd matlab
 validate_sim     % six self-checks, must print 6 / 6

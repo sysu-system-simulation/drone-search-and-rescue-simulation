@@ -125,6 +125,10 @@ One static target, drawn from the prior at the start of each replication. The **
 is reused for every strategy and fleet size (common random numbers), so differences between
 strategies are not caused by different targets.
 
+Every experiment and reported result uses this single target. `simulate_once.m` also accepts
+several targets so that `search_app` can demonstrate missions with 1–5 people; that path is for
+demonstration only and is outside the verified study.
+
 ---
 
 ## 5. Search strategies
@@ -235,11 +239,11 @@ The summary must be 6 / 6 PASS.
 ## 10. Out of scope / future work
 
 - Battery, return-to-base and recharge as explicit states.
-- Multiple missing people (the original draft allowed 1…10).
+- Multiple missing people in the experiments (the original draft allowed 1…10). The interactive
+  app already simulates 1–5 people for demonstration, but no experiment or reported result uses it.
 - Hills terrain class.
 - Adaptive cooperative task reassignment.
 - Cost-effectiveness analysis.
-- Animated playback of a mission.
 
 ---
 
@@ -262,6 +266,8 @@ The summary must be 6 / 6 PASS.
 | `run_convergence.m` | running estimate and 1/√n half-width (Figure 4) |
 | `style_figure.m` | shared figure styling for all exports |
 | `plot_scenario.m` | scenario figure |
+| `animate_search.m` | animated playback of one mission (demonstration only) |
+| `search_app.m` | interactive app: animate a mission or run a statistical analysis, 1–5 people (demonstration only) |
 | `run_all.m` | verification, the three experiments and the two methodological checks |
 
 Run order:

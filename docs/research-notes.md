@@ -151,7 +151,7 @@ scored on simulation quality).
 | `run_experiment1.m` | fleet-size saturation on the open map (N = 1…20) |
 | `run_experiment2.m` | the 3 strategies at their own N\*, on 4 terrains |
 | `run_experiment3.m` | sweep width ×0.5 / ×1 / ×2 |
-| `validate_sim.m` | 6 self-checks: prior sums to 1, detection MC, independence bound, coverage, reproducibility, N\* rule |
+| `validate_sim.m` | 10 self-checks: prior sums to 1, detection MC, independence bound, coverage, reproducibility, N\* rule, multi-target counts, multi-target determinism, single-target contract, target-index validation |
 | `plot_scenario.m` | terrain + prior + tracks figure for the paper |
 | `run_all.m` | verification, then the three experiments |
 

@@ -199,16 +199,20 @@ noise and a slowly rising curve never satisfies it.
 
 ## 8. Verification
 
-`validate_sim.m` runs six checks before any result is used:
+`validate_sim.m` runs ten checks before any result is used:
 
 1. the prior sums to 1 and `detP` matches `1 - exp(-W)` for every terrain class;
 2. a Monte Carlo of the per-pass detection reproduces the analytic `p`;
 3. the random-walk baseline stays below the independence bound `1 - (1 - P_1)^N`;
 4. coverage increases with fleet size for the systematic strategy;
 5. a fixed seed reproduces the same mission exactly;
-6. the saturation rule finds the knee of a synthetic curve.
+6. the saturation rule finds the knee of a synthetic curve;
+7. a multi-target mission reports consistent `found`, `foundCount` and `timesFound`;
+8. a multi-target mission repeats exactly under the same seed;
+9. a single target still returns the original scalar contract;
+10. target indices out of range or non-integer are rejected, boundary cells accepted.
 
-The summary must be 6 / 6 PASS.
+The summary must be 10 / 10 PASS.
 
 ---
 
@@ -257,7 +261,7 @@ The summary must be 6 / 6 PASS.
 | `run_experiment1.m` | fleet-size saturation |
 | `run_experiment2.m` | strategy × terrain |
 | `run_experiment3.m` | sweep-width sensitivity |
-| `validate_sim.m` | the six self-checks |
+| `validate_sim.m` | the ten self-checks |
 | `check_sampling.m` | inverse-transform validation: 20 000 draws vs the analytical prior (Figure 5) |
 | `run_convergence.m` | running estimate and 1/√n half-width (Figure 4) |
 | `style_figure.m` | shared figure styling for all exports |
@@ -267,7 +271,7 @@ The summary must be 6 / 6 PASS.
 Run order:
 
 ```matlab
-validate_sim          % must print 6 / 6 PASS
+validate_sim          % must print 10 / 10 PASS
 run_all               % verification, Experiments 1-3, convergence and sampling checks
 plot_scenario('mixed', 5)
 ```

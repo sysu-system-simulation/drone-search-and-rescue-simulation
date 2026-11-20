@@ -55,7 +55,7 @@ To reproduce the project experiments:
 
 ```matlab
 cd matlab
-validate_sim     % six self-checks, must print 6 / 6
+validate_sim     % ten self-checks, must print 10 / 10
 run_all          % three experiments + convergence and sampling checks
 ```
 

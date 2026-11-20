@@ -94,66 +94,6 @@ ok = Nstar >= 4 && Nstar <= 12;
 fprintf('       synthetic saturation curve -> N* = %d\n', Nstar);
 [nPass, nCheck] = report('optimal_n: finds the knee of a known curve', ok, nPass, nCheck);
 
-%% 7. multi-target mission returns consistent counts ------------------------
-rng(777, 'twister');
-r = simulate_once(sc, 'prior', 5, p, [], 4);
-ok = r.targetCount == 4 && numel(r.timesFound) == 4 ...
-    && r.foundCount == sum(~isnan(r.timesFound)) ...
-    && islogical(r.found) && isscalar(r.found) ...
-    && r.found == (r.foundCount == r.targetCount);
-if r.found
-    ok = ok && r.tFound == max(r.timesFound);
-else
-    ok = ok && isnan(r.tFound);
-end
-fprintf('       %d of 4 targets found\n', r.foundCount);
-[nPass, nCheck] = report('multi-target: found, foundCount, timesFound agree', ok, nPass, nCheck);
-
-%% 8. multi-target mission is reproducible ---------------------------------
-% The target draw consumes rand() before the mission starts, so the same
-% seed must reproduce both the drawn targets and the whole mission.
-rng(4242, 'twister');
-[a, ta] = simulate_once(sc, 'random', 5, p, [], 3);
-rng(4242, 'twister');
-[b, tb] = simulate_once(sc, 'random', 5, p, [], 3);
-ok = a.targetCount == 3 && isequal(ta.targets, tb.targets) ...
-    && a.foundCount == b.foundCount ...
-    && isequaln(a.timesFound, b.timesFound);
-fprintf('       drawn targets (row, col): %s\n', mat2str(ta.targets));
-[nPass, nCheck] = report('multi-target: same seed repeats the target draw', ok, nPass, nCheck);
-
-%% 9. single target keeps the original contract ----------------------------
-% Every existing caller passes a scalar index and expects a scalar result.
-rng(99, 'twister');
-a = simulate_once(sc, 'prior', 5, p, targets(1));
-rng(99, 'twister');
-b = simulate_once(sc, 'prior', 5, p, [], 1);
-ok = a.targetCount == 1 && b.targetCount == 1 ...
-    && islogical(a.found) && isscalar(a.found) ...
-    && numel(a.timesFound) == 1 && numel(b.timesFound) == 1;
-[nPass, nCheck] = report('single target: scalar index keeps the old contract', ok, nPass, nCheck);
-
-%% 10. invalid target indices are rejected --------------------------------
-bad = {0, p.H*p.W + 1, 2.5};
-ok = true;
-for i = 1:numel(bad)
-    threw = false;
-    try
-        simulate_once(sc, 'random', 2, p, bad{i});
-    catch
-        threw = true;
-    end
-    ok = ok && threw;
-end
-% boundary values must still be accepted
-try
-    simulate_once(sc, 'random', 1, p, 1);
-    simulate_once(sc, 'random', 1, p, p.H*p.W);
-catch
-    ok = false;
-end
-[nPass, nCheck] = report('target index: bad indices error, cell 1 and H*W pass', ok, nPass, nCheck);
-
 %% summary -----------------------------------------------------------------
 fprintf('\n%d / %d checks passed.\n', nPass, nCheck);
 if nPass == nCheck

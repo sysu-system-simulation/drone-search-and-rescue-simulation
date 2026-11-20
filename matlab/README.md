@@ -48,7 +48,7 @@ To run the command-line experiments:
    validate_sim
    ```
 
-   It must print `10 / 10 checks passed`.
+   It must print `6 / 6 checks passed`.
 
 3. Run the three experiments:
 
@@ -134,7 +134,7 @@ The paper, the writing outline and the slide deck live one level up, next to thi
 | `run_experiment3.m` | sweep-width sensitivity |
 | `run_convergence.m` | Monte Carlo convergence: running estimate and 1/sqrt(n) uncertainty |
 | `check_sampling.m` | inverse-transform validation: simulated vs analytical prior |
-| `validate_sim.m` | ten model self-checks |
+| `validate_sim.m` | six model self-checks |
 | `plot_scenario.m` | scenario figure |
 | `style_figure.m` | light, print-friendly figure styling |
 | `run_all.m` | verification + the three experiments + course-method checks |

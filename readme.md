@@ -73,7 +73,7 @@ numbers are identical on any machine running the same MATLAB version.
 
 - Prior-guided search wins only for small fleets; at saturation the two planned strategies are
   statistically indistinguishable on every terrain.
-- Terrain lowers success by 7 to 13 percentage points without reordering the planned strategies.
+- Terrain lowers success by 7.5 to 15.5 percentage points without reordering the planned strategies.
 - Halving the sweep width costs about 19 percentage points - more than any strategy choice.
 
 ## Notes

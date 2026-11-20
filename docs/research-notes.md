@@ -155,8 +155,8 @@ scored on simulation quality).
 | `plot_scenario.m` | terrain + prior + tracks figure for the paper |
 | `run_all.m` | verification, then the three experiments |
 
-The Python package in `uavsar/` is kept only as an archived prototype; it is not part of the
-submission.
+An earlier Python prototype is kept locally by the team as an archived reference; it is not in this
+repository and is not part of the submission.
 
 ---
 

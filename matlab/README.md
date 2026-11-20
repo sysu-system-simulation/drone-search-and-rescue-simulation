@@ -114,7 +114,8 @@ the mean of the last three points, and N* is the smallest fleet reaching 95% of 
 
 ## Related documents
 
-The paper, the writing outline and the slide deck live one level up, next to this folder.
+The writing outline and the slide deck are in [`../docs/`](../docs). The paper draft is kept
+off-repo; see the top-level README for the collaboration links.
 
 ## Files
 

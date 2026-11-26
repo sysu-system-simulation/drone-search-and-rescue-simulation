@@ -80,21 +80,21 @@ Outputs are written to `results/` (CSV and MAT) and `figures/` (PNG).
 
 | | Parallel track | Probability-based | Random walk |
 |---|---|---|---|
-| N = 1 | 0.040 | 0.365 | 0.048 |
-| N = 20 | 0.943 | 0.963 | 0.540 |
-| N* | 14 | 15 | 18 |
+| N = 1 | 0.038 | 0.258 | 0.053 |
+| N = 20 | 0.938 | 0.943 | 0.675 |
+| N* | 15 | 15 | 18 |
 
 Detection probability at each strategy's own N*, by terrain:
 
 | Terrain | Parallel | Probability-based | Random |
 |---|---|---|---|
-| Open | 0.895 | 0.885 | 0.525 |
-| Forest | 0.773 | 0.783 | 0.458 |
-| Urban | 0.760 | 0.730 | 0.635 |
-| Mixed | 0.820 | 0.810 | 0.573 |
+| Open | 0.890 | 0.883 | 0.625 |
+| Forest | 0.780 | 0.783 | 0.563 |
+| Urban | 0.780 | 0.768 | 0.565 |
+| Mixed | 0.793 | 0.815 | 0.578 |
 
-Sweep width x0.5 / x1 / x2: parallel 0.708 / 0.895 / 0.985, probability-based
-0.700 / 0.885 / 0.983, random 0.438 / 0.525 / 0.603.
+Sweep width x0.5 / x1 / x2: parallel 0.665 / 0.890 / 0.983, probability-based
+0.688 / 0.883 / 0.973, random 0.568 / 0.625 / 0.683.
 
 Three findings: prior-guided search wins only for small fleets; the two planned strategies are
 statistically tied at saturation on every terrain; sensor quality matters more than strategy choice.

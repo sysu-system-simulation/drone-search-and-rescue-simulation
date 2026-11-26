@@ -32,7 +32,7 @@ would be invented rather than measured.
 
 Two hard requirements come from the course, not from the model:
 
-- **Paper length ≥ 5,000 words** (excluding references). The current draft is about 6,700.
+- **Paper length ≥ 5,000 words** (excluding references). The reference draft is about 6,500.
 - **A presentation in the final class**, roughly 10 minutes, plus questions.
 
 Both deliverables are built from the same three figures and three experiments, so the presentation
@@ -93,7 +93,8 @@ would be physically wrong and is not used.
 A probability map `prior(row, col)` states where the missing person probably is. It is built from
 
 - a terrain weight (a person is more likely in forest/urban cover and almost never in water), and
-- two Gaussian "last seen" hot spots.
+- two Gaussian "last seen" hot spots seeded independently of terrain generation (`seed + 25`) so
+  all four maps share identical hotspot locations.
 
 The prior sums to 1 and is the **only** extra information the probability-based strategy receives.
 The other two strategies ignore it, which is the point of the comparison.
@@ -122,8 +123,10 @@ first draft.
 ### 4.4 Missing person
 
 One static target, drawn from the prior at the start of each replication. The **same** target index
-is reused for every strategy and fleet size (common random numbers), so differences between
-strategies are not caused by different targets.
+is reused for every strategy and fleet size, and each `(strategy, N)` pair uses an isolated RNG
+stream shared across terrains and sweep scales (common random numbers), so differences between
+strategies are not caused by different targets and Open-map baselines match identically across
+Experiments 1–4.
 
 Every experiment and reported result uses this single target. `simulate_once.m` also accepts
 several targets so that `search_app` can demonstrate missions with 1–5 people; that path is for
@@ -206,7 +209,8 @@ noise and a slowly rising curve never satisfies it.
 `validate_sim.m` runs six checks before any result is used:
 
 1. the prior sums to 1 and `detP` matches `1 - exp(-W)` for every terrain class;
-2. a Monte Carlo of the per-pass detection reproduces the analytic `p`;
+2. a Monte Carlo of the per-pass detection calls `simulate_once.m` end-to-end across 4,000 one-step
+   missions to reproduce the analytic `p`;
 3. the random-walk baseline stays below the independence bound `1 - (1 - P_1)^N`;
 4. coverage increases with fleet size for the systematic strategy;
 5. a fixed seed reproduces the same mission exactly;

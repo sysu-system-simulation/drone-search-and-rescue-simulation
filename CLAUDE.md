@@ -47,15 +47,15 @@ never part of the simulation or the paper.
 
 | | Parallel track | Probability-based | Random walk |
 |---|---|---|---|
-| P(found), N = 1 | 0.040 | 0.365 | 0.048 |
-| P(found), N = 20 | 0.943 | 0.963 | 0.540 |
-| N\* | 14 | 15 | 18 |
+| P(found), N = 1 | 0.038 | 0.258 | 0.053 |
+| P(found), N = 20 | 0.938 | 0.943 | 0.675 |
+| N\* | 15 | 15 | 18 |
 
 - RQ1: the prior pays off only for small fleets; the N = 20 difference is not significant.
-- RQ2: terrain lowers the planned strategies by **7.5–15.5 pp** vs open (parallel: forest −12.2,
-  urban −13.5, mixed −7.5; probability-based: −10.2, −15.5, −7.5) without reordering them. Random
-  walk is last everywhere except urban.
-- RQ3: halving sweep width costs ~19 pp (parallel −18.8, probability-based −18.5, random −8.8) —
+- RQ2: terrain lowers the planned strategies by **6.8–11.5 pp** vs open (parallel: forest −11.0,
+  urban −11.0, mixed −9.8; probability-based: −10.0, −11.5, −6.8) without reordering them. Random
+  walk is last on every terrain.
+- RQ3: halving sweep width costs ~20–23 pp (parallel −22.5, probability-based −19.5, random −5.8) —
   larger than any strategy difference.
 
 ## Running the code
@@ -77,8 +77,11 @@ search_app       % interactive GUI: animate a mission, run a statistical analysi
   recomputes its paths after every call for this reason.
 - Strategy keys in code: `'parallel'`, `'prior'`, `'random'`. Map kinds: `'open'`, `'forest'`,
   `'urban'`, `'mixed'`. Terrain codes 1–4 = open, forest, urban, water.
-- Common random numbers: the same target indices are reused across strategies and fleet sizes;
-  keep that when adding any comparison.
+- Common random numbers: the same target indices are reused across strategies and fleet sizes,
+  and each `(strategy, N)` uses an isolated RNG stream shared across terrains and sweep scales so
+  Open-map baselines match identically across Experiments 1–4; keep that when adding any comparison.
+- `make_scenario.m` seeds the two Gaussian hotspots independently of terrain generation (`seed + 25`)
+  so all four terrain maps share identical hotspot locations.
 - Missions always run the full 300 steps, even after detection, so `coverage` is not censored.
 - The independence bound `1 − (1 − P₁)^N` applies to the random walk only. Parallel track beating
   it is expected (bands shrink with N), not a bug.

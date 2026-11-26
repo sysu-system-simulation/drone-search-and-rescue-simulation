@@ -56,6 +56,9 @@ end
 % A lost person is more likely in forest / urban cover and almost never in
 % water, plus two "last seen" hot spots.  This is the ONLY information the
 % prior-aware strategy gets; the other strategies ignore it.
+% Decouple hotspot RNG from terrain-patch draws so Experiment 2 isolates
+% terrain visibility without shifting hotspots relative to the launch base.
+rng(seed + 25, 'twister');
 baseW = [1.0 1.6 1.2 0.05];
 w = baseW(terrain);
 hot = zeros(H, W);

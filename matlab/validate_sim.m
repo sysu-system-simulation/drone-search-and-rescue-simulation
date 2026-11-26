@@ -27,38 +27,54 @@ for i = 1:numel(kinds)
 end
 [nPass, nCheck] = report('scenario: prior sums to 1, detP matches 1-exp(-W)', ok, nPass, nCheck);
 
-%% 2. detection formula is implemented correctly ---------------------------
+%% 2. detection formula is implemented correctly inside simulate_once -------
+% Place a single target at (19,19) (reached on step t=1 by a parallel drone
+% launching from base (20,20) toward (1,1)) and verify simulate_once reproduces
+% sc.detP(19,19) across independent 1-step missions.
 sc = make_scenario('open', p.mapSeed, p);
-p0 = sc.detP(20, 20);
-n  = 20000;
-hits = sum(rand(n, 1) < p0);
+pOne = p;
+pOne.tMax = 1;
+tgt1 = sub2ind([p.H p.W], p.base(1) - 1, p.base(2) - 1);
+p0 = sc.detP(p.base(1) - 1, p.base(2) - 1);
+n  = 4000;
+rng(42, 'twister');
+hits = 0;
+for k = 1:n
+    r = simulate_once(sc, 'parallel', 1, pOne, tgt1);
+    hits = hits + r.found;
+end
 se   = sqrt(p0*(1-p0)/n);
 ok   = abs(hits/n - p0) < 3*se;
 fprintf('       target p = %.4f, simulated %.4f (3*SE = %.4f)\n', p0, hits/n, 3*se);
-[nPass, nCheck] = report('detection: Monte Carlo reproduces the per-pass p', ok, nPass, nCheck);
+[nPass, nCheck] = report('detection: simulate_once reproduces the per-pass p', ok, nPass, nCheck);
 
 %% 3. independent whole-map searchers follow the independence bound ---------
 % The bound P_N = 1-(1-P1)^N only applies when every drone runs the SAME
 % whole-map search independently.  That is the random-walk baseline.
 % It must NOT be applied to parallel track: there each drone owns a band
 % that shrinks with N, so its per-drone search effort is not P1.
+nVal = p.reps;
 rng(p.targetSeed, 'twister');
 cdf = cumsum(sc.prior(:));
-u = rand(200, 1);
+u = rand(nVal, 1);
 targets = arrayfun(@(x) find(cdf >= x, 1), u);
 
 Ns = [1 2 4];
 Pf = zeros(1, numel(Ns));
 for j = 1:numel(Ns)
+    rng(p.targetSeed + 30000 + 100*Ns(j), 'twister');
     hits = 0;
-    for k = 1:numel(targets)
+    for k = 1:nVal
         r = simulate_once(sc, 'random', Ns(j), p, targets(k));
         hits = hits + r.found;
     end
-    Pf(j) = hits / numel(targets);
+    Pf(j) = hits / nVal;
 end
-bound = 1 - (1 - Pf(1)).^Ns;
-ok = all(Pf <= bound + 0.05);   % overlap can only lower P, never raise it
+bound   = 1 - (1 - Pf(1)).^Ns;
+seP     = sqrt(Pf .* (1 - Pf) / nVal);
+seBound = Ns .* (1 - Pf(1)).^(Ns - 1) * seP(1);
+margin  = 3 * sqrt(seP.^2 + seBound.^2);
+ok = all(Pf <= bound + margin);   % overlap can only lower P, never raise it
 fprintf('       P = [%.3f %.3f %.3f], independence bound = [%.3f %.3f %.3f]\n', ...
     Pf(1), Pf(2), Pf(3), bound(1), bound(2), bound(3));
 [nPass, nCheck] = report('overlap: random-walk fleet stays below 1-(1-P1)^N', ok, nPass, nCheck);

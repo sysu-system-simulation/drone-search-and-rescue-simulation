@@ -36,6 +36,8 @@ P  = zeros(nReps, nS);
 HW = zeros(nReps, nS);
 
 for s = 1:nS
+    % Match Experiment 1 stream for (strategy s, N = nUav)
+    rng(p.targetSeed + 10000*s + 100*nUav, 'twister');
     hits = zeros(nReps, 1);
     for k = 1:nReps
         r = simulate_once(sc, strats{s}, nUav, p, tgt(k));

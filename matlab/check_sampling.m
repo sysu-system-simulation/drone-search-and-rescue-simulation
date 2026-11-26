@@ -33,15 +33,17 @@ emp  = accumarray(idx, 1, [H*W 1]) / nDraws;
 anal = sc.prior(:);
 
 % --- validation metrics ----------------------------------------------------
+cellSE          = sqrt(anal .* (1 - anal) / nDraws);
 metrics.tv      = 0.5 * sum(abs(emp - anal));              % total variation
 metrics.maxDev  = max(abs(emp - anal));                    % worst cell
-metrics.seScale = sqrt(mean(anal .* (1 - anal)) / nDraws); % expected error
+metrics.seScale = sqrt(mean(anal .* (1 - anal)) / nDraws); % mean-cell SE
+metrics.zMax    = max(abs(emp - anal) ./ cellSE);          % max standardized deviation
 
 fprintf('[inverse transform] %s map, %d draws\n', kind, nDraws);
 fprintf('    total-variation distance : %.5f\n', metrics.tv);
 fprintf('    largest cell deviation   : %.6f\n', metrics.maxDev);
-fprintf('    expected sampling error  : %.6f\n', metrics.seScale);
-if metrics.maxDev < 5 * metrics.seScale
+fprintf('    max cell |z|-score       : %.2f (threshold 5.00)\n', metrics.zMax);
+if metrics.zMax < 5
     fprintf('    PASS: deviations are consistent with sampling noise\n');
 else
     fprintf('    CHECK: deviation is larger than sampling noise\n');

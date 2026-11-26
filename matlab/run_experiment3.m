@@ -50,6 +50,8 @@ for w = 1:nW
 
     fprintf('%14s', scaleNames{w});
     for s = 1:nS
+        % Match Experiment 1 & 2 baseline stream and use CRN across sweep scales
+        rng(p.targetSeed + 10000*s + 100*Nstar(s), 'twister');
         hits = 0;
         for k = 1:p.reps
             r = simulate_once(sc, names{s}, Nstar(s), p, targets(k));

@@ -67,14 +67,16 @@ numbers are identical on any machine running the same MATLAB version.
 
 | | Parallel track | Probability-based | Random walk |
 |---|---|---|---|
-| N = 1 | 0.040 | 0.365 | 0.048 |
-| N = 20 | 0.943 | 0.963 | 0.540 |
-| Saturation N* | 14 | 15 | 18 |
+| N = 1 | 0.038 | 0.258 | 0.053 |
+| N = 20 | 0.938 | 0.943 | 0.675 |
+| Saturation N* | 15 | 15 | 18 |
 
 - Prior-guided search wins only for small fleets; at saturation the two planned strategies are
   statistically indistinguishable on every terrain.
-- Terrain lowers success by 7.5 to 15.5 percentage points without reordering the planned strategies.
-- Halving the sweep width costs about 19 percentage points - more than any strategy choice.
+- Terrain lowers success for the planned strategies by 6.8 to 11.5 percentage points without
+  reordering them, and random walk finishes last on every terrain.
+- Halving the sweep width costs 19.5 to 22.5 percentage points for the planned strategies — more
+  than any strategy choice.
 
 ## Notes
 

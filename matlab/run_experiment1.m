@@ -38,6 +38,9 @@ fprintf('%4s %14s %14s %14s\n', 'N', labels{:});
 for N = 1:p.nMax
     fprintf('%4d', N);
     for s = 1:nS
+        % Isolate each (strategy, N) detection/movement RNG stream so identical
+        % configurations yield identical results across Experiments 1-4.
+        rng(p.targetSeed + 10000*s + 100*N, 'twister');
         hits = 0;  covSum = 0;
         for k = 1:p.reps
             r = simulate_once(sc, names{s}, N, p, targets(k));
